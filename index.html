@@ -1,78 +1,71 @@
 <!DOCTYPE html>
 <html>
-
-	<head lang="en">
-		<meta charset="UTF-8">
-		<title></title>
-		<script type="text/javascript" src="http://123.56.106.187:8010/Scripts/listjs/jquery-1.7.2.min.js"></script>
-		<script>
-			//判断浏览器是否支持HTML5 Canvas
-			window.onload = function() {
-				try {
-					//动态创建一个canvas元 ，并获取他2Dcontext。如果出现异常则表示不支持 document.createElement("canvas").getContext("2d");
-					// document.getElementById("support").innerHTML = "浏览器支持HTML5 CANVAS";
-				} catch(e) {
-					// document.getElementByIdx("support").innerHTML = "浏览器不支持HTML5 CANVAS";
-				}
-			};
-			//这段代 主要是获取摄像头的视频流并显示在Video 签中
-			window.addEventListener("DOMContentLoaded", function() {
-				var canvas = document.getElementById("canvas"),
-					context = canvas.getContext("2d"),
-					video = document.getElementById("video"),
-					videoObj = { "video": true },
-					errBack = function(error) {
-						console.log("Video capture error: ", error.code);
-					};
-				$("#snap").click(function() {
-					context.drawImage(video, 0, 0, 330, 250);
-				})
-				//navigator.getUserMedia这个写法在Opera中好像是navigator.getUserMedianow
-				if(navigator.getUserMedia) {
-					navigator.getUserMedia(videoObj, function(stream) {
-						video.src = stream;
-						video.play();
-					}, errBack);
-				} else if(navigator.webkitGetUserMedia) {
-					navigator.webkitGetUserMedia(videoObj, function(stream) {
-						video.src = window.webkitURL.createObjectURL(stream);
-						video.play();
-					}, errBack);
-				}
-
-			}, false);
-
-			//上传服务器
-			function CatchCode() {
-				var canvans = document.getElementById("canvas");
-				//获取浏览器页面的画布对象
-				//以下开始编 数据
-				var imgData = canvans.toDataURL();
-				//将图像转换为base64数据
-				var base64Data = imgData.substr(22);
-				//在前端截取22位之后的字符串作为图像数据
-				//开始异步上
-				$.post("uploadImgCode.ashx", { "img": base64Data }, function(data, status) {
-					if(status == "success") {
-						if(data == "OK") {
-							alert("二维 已经解析");
-						} else {
-							// alert(data);
-						}
-					} else {
-						alert("数据上 失败");
-					}
-				}, "text");
+	<head>
+		<meta charset="utf-8" />
+		<title>微信接口调用摄像头</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1, maximum-scale=1,,user-scalable=no">
+		
+		<link rel="stylesheet" href="css/common.css" />
+		<style>
+			html{
+				width: 100%;
+				height: 100%;
 			}
-		</script>
+			body{
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			.all{
+				width: 100%;
+				height: 100%;
+			}
+			img{
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+			.all>div{
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				margin: auto;
+			}
+			.all>div:nth-child(1){
+				z-index: 10;
+			}
+		</style>
 	</head>
-
 	<body>
-		<div id="contentHolder">
-			<video id="video" width="320" height="320" autoplay></video>
-			<input type="button" id="snap" style="width:100px;height:35px;" value="拍 照" />
-			<canvas style="" id="canvas" width="320" height="320"></canvas>
+		<div class="all">
+			<div id="paizhao">
+				<img src="img/1.png"/>
+			</div>
+			<div class="myimg">
+				<img src="" alt="" />
+			</div>
 		</div>
 	</body>
-
+	<script src="js/zepto.min.js"></script>
+	<script src="js/jweixin.js" type="text/javascript" charset="utf-8"></script>
+	<script>
+		var pic = document.getElementById('paizhao');
+		
+		paizhao.onclick = function(){
+//			console.log(123);
+			wx.chooseImage({
+				
+				  	count: 1, // 默认9
+				  	sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+				    sourceType: ['album', 'camera'], 				// 可以指定来源是相册还是相机，默认二者都有
+				    success: function (res) {
+				        localId = res.localIds; 				// 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+			        	$('.myimg img').attr('src',localId);
+			       }
+//			        	alert('localId'+localId);
+			})
+		}
+	</script>
 </html>
